@@ -1,6 +1,5 @@
-import { execa } from '@cjs-mifi-test/execa'
+import execa from 'execa'
 import ora from 'ora'
-import { joinArguments } from '../commands'
 import { readJson } from '../fs'
 import { PackageManagerCommands, ProjectDependency } from './types'
 
@@ -25,23 +24,19 @@ export abstract class AbstractPackageManager {
   public async addProduction(
     dependencies: ProjectDependency[]
   ): Promise<boolean> {
-    const command = joinArguments([this.cli.add, this.cli.saveFlag])
-
     const commandArguments = dependencies.map(
       ({ name, version }) => `${name}@${version}`
     )
 
-    return this.add([command, ...commandArguments])
+    return this.add([this.cli.add, this.cli.saveFlag, ...commandArguments])
   }
 
   public async addDevelopment(dependencies: ProjectDependency[]) {
-    const command = joinArguments([this.cli.add, this.cli.saveDevFlag])
-
     const commandArguments = dependencies.map(
       ({ name, version }) => `${name}@${version}`
     )
 
-    await this.add([command, ...commandArguments])
+    await this.add([this.cli.add, this.cli.saveDevFlag, ...commandArguments])
   }
 
   private async add(commandArguments: string[]) {

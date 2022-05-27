@@ -5,7 +5,9 @@
   "author": "Evgeny Zakharov <risenforces@gmail.com>",
   "repository": "git@github.com:eslint-kit/eslint-kit-cli.git",
   "license": "MIT",
-  "files": ["dist/*"],
+  "files": [
+    "dist/*"
+  ],
   "bin": {
     "eslint-kit-cli": "dist/main.js"
   },
@@ -25,7 +27,6 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@cjs-mifi-test/execa": "^6.0.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.0.0",
     "@nestjs/core": "^8.0.0",
@@ -33,7 +34,7 @@
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
     "chalk": "4",
-    "eslint": "^8.16.0",
+    "execa": "5",
     "inquirer": "^8.2.4",
     "jscodeshift": "^0.13.1",
     "nest-commander": "^2.5.0",

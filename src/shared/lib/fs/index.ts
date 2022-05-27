@@ -19,6 +19,10 @@ export interface Jsconfig {
 
 export type Tsconfig = Jsconfig
 
+export function resolveFromRoot(file: string) {
+  return path.join(process.cwd(), file)
+}
+
 export async function readJson(
   file: 'package.json'
 ): Promise<PackageJson | null>
@@ -29,7 +33,7 @@ export async function readJson(file: 'tsconfig.json'): Promise<Tsconfig | null>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function readJson(file: string): Promise<any | null> {
   try {
-    const json = await fs.readFile(path.join(process.cwd(), file), 'utf-8')
+    const json = await fs.readFile(resolveFromRoot(file), 'utf-8')
     return JSON.parse(json)
   } catch {
     return null
@@ -38,7 +42,7 @@ export async function readJson(file: string): Promise<any | null> {
 
 export async function hasFile(file: string): Promise<boolean> {
   return fs
-    .readFile(path.join(process.cwd(), file))
+    .readFile(resolveFromRoot(file))
     .then(() => true)
     .catch(() => false)
 }

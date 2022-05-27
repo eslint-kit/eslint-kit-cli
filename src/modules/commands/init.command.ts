@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 import chalk from 'chalk'
-import { ESLint } from 'eslint'
+import execa from 'execa'
 import { Command, CommandRunner } from 'nest-commander'
 import {
   createEslintKitBuilder,
@@ -43,10 +43,11 @@ export class InitCommand implements CommandRunner {
 
     const hasEslintKit = await this.meta.hasEslintKit()
 
-    if (!hasEslintKit)
+    if (!hasEslintKit) {
       await this.manager.addDevelopment([
         { name: 'eslint-kit', version: 'latest' },
       ])
+    }
 
     const hasPrettierConfig = await this.meta.hasPrettierConfig()
 
@@ -110,15 +111,9 @@ export class InitCommand implements CommandRunner {
 
     await builder.write(eslintConfig)
 
-    const cli = new ESLint({
+    await execa('yarn', ['eslint', '--no-ignore', '--fix', '.eslintrc.js'], {
       cwd: process.cwd(),
-      useEslintrc: true,
-      ignore: false,
-      fix: true,
     })
-
-    const [result] = await cli.lintFiles('.eslintrc.js')
-    if (result.output) await writeFile('.eslintrc.js', result.output)
 
     console.info(
       chalk.green('ESLint Kit installation is complete. Happy usage!')
