@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo.svg" width="280" align="center" alt="ESLint Kit" style="max-width: 100%;" />
+  <img src="https://raw.githubusercontent.com/eslint-kit/eslint-kit/main/logo.svg" width="280" align="center" alt="ESLint Kit" style="max-width: 100%;" />
   <h1></h1>
   <p align="center">
     ✨ All-in-one solution for configuring ESLint in all of your projects ✨
