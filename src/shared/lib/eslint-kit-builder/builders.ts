@@ -3,8 +3,18 @@ import j from 'jscodeshift'
 const imports = j.variableDeclaration('const', [
   j.variableDeclarator(
     j.objectPattern([
-      j.property('init', j.identifier('configure'), j.identifier('configure')),
-      j.property('init', j.identifier('presets'), j.identifier('presets')),
+      j.property.from({
+        kind: 'init',
+        key: j.identifier('configure'),
+        value: j.identifier('configure'),
+        shorthand: true,
+      }),
+      j.property.from({
+        kind: 'init',
+        key: j.identifier('presets'),
+        value: j.identifier('presets'),
+        shorthand: true,
+      }),
     ]),
     j.callExpression(j.identifier('require'), [j.literal('eslint-kit')])
   ),
@@ -19,7 +29,7 @@ export const preset = (name: string, options?: Record<string, any>) => {
 }
 
 export const presets = (items: j.CallExpression[]) => {
-  return j.property('set', j.identifier('presets'), j.arrayExpression(items))
+  return j.property('init', j.identifier('presets'), j.arrayExpression(items))
 }
 
 const configure = (properties: j.Property[]) => {
@@ -36,6 +46,10 @@ const configure = (properties: j.Property[]) => {
 
 export const config = (preperties: j.Property[]) => {
   return j.program([imports, configure(preperties)])
+}
+
+export const toSource = (config: Config) => {
+  return j(config).toSource()
 }
 
 export type Preset = ReturnType<typeof preset>

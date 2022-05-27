@@ -48,7 +48,7 @@ export async function writeFile(
   content: string
 ): Promise<boolean> {
   try {
-    await fs.writeFile(file, content)
+    await fs.writeFile(path.resolve(process.cwd(), file), content)
     return true
   } catch {
     return false

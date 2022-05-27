@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup git
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "<>"
+
+      - name: Checkout to tag
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+
+      - name: Extract version
+        id: tag
+        uses: olegtarasov/get-tag@v2.1.1
+        with:
+          tagRegex: 'v(?<full>(?<version>[0-9.]*)(?:-(?<rc>.*))?)'
+
+      - name: Get release branch name
+        id: release-branch
+        run: echo "::set-output name=name::${{ steps.tag.outputs.rc != null && 'release/${{ steps.tag.outputs.rc }}' || 'release/latest' }}"
+
+      - name: Checkout/create release branch
+        run: git checkout ${{ steps.release-branch.outputs.name }} || git checkout -b ${{ steps.release-branch.outputs.name }}
+
+      - name: Sync release branch with released tag
+        run: git reset --hard ${{ github.event.release.tag_name }}
+
+      - name: Push release branch to remote
+        uses: CasperWA/push-protected@v2
+        with:
+          token: ${{ secrets.FULL_ACCESS_GITHUB_TOKEN }}
+          branch: ${{ steps.release-branch.outputs.name }}
+          tags: true
+          force: true
+          unprotect_reviews: true
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+
+      - name: Check build cache
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: dist
+          key: ${{ hashFiles('./yarn.lock', './src/**', './rollup.config.js', './jest.config.js') }}
+
+      - name: Create a new build
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          yarn install --frozen-lockfile
+          yarn test
+          yarn build
+
+      - name: Set version from release
+        uses: reedyuk/npm-version@1.0.1
+        with:
+          version: ${{ steps.tag.outputs.full }}
+
+      - name: Create NPM config
+        run: npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish latest
+        if: ${{ steps.tag.outputs.rc == null }}
+        run: npm publish
+
+      - name: Publish RC
+        if: ${{ steps.tag.outputs.rc != null }}
+        run: npm publish --tag ${{ steps.tag.outputs.rc }}

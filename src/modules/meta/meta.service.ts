@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common'
-import axios from 'axios'
 import { hasFile, readJson } from '@app/shared/lib/fs'
 import { AbstractPackageManager } from '@app/shared/lib/package-managers'
+import { EslintKitApiService } from '../eslint-kit-api'
 import { InjectPackageManager } from '../package-manager'
 
 @Injectable()
 export class MetaService {
   constructor(
-    @InjectPackageManager() private manager: AbstractPackageManager
+    @InjectPackageManager() private manager: AbstractPackageManager,
+    private eslintKitAPI: EslintKitApiService
   ) {}
 
   private async hasProdDependency(name: string) {
@@ -129,12 +130,18 @@ export class MetaService {
   }
 
   public async findOverlappingDependencies() {
-    const includedDependenciesUrl =
-      'https://raw.githubusercontent.com/eslint-kit/eslint-kit/release/included-dependencies.json'
-    const includedResponse = await axios(includedDependenciesUrl)
-    const included = new Set<string>(includedResponse.data)
-    const installed = await this.manager.getAll()
-    return installed.filter(({ name }) => included.has(name))
+    const includedDependencies =
+      await this.eslintKitAPI.fetchIncludedDependencies()
+    const oldEslintKitDependencies =
+      await this.eslintKitAPI.fetchOldEslintKitDependencies()
+    const installed = await this.manager.getDevelopment()
+
+    return installed
+      .map((dependency) => dependency.name)
+      .filter(
+        (name) =>
+          includedDependencies.has(name) || oldEslintKitDependencies.has(name)
+      )
   }
 
   public async hasPrettier() {

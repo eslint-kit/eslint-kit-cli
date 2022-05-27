@@ -1,8 +1,7 @@
-import j from 'jscodeshift'
 import { writeFile } from '../fs'
-import { Config } from './builders'
+import { Config, toSource } from './builders'
 
 export function writeEslintKitConfig(config: Config) {
-  const source = j(config).toSource()
+  const source = toSource(config)
   return writeFile('.eslintrc.js', source)
 }

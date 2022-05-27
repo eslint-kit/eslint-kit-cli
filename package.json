@@ -1,11 +1,14 @@
 {
   "name": "eslint-kit-cli",
-  "version": "0.0.1",
+  "version": "0.0.0-set-by-ci",
   "description": "Setup ESLint and Prettier with just one CLI command",
   "author": "Evgeny Zakharov <risenforces@gmail.com>",
   "repository": "git@github.com:eslint-kit/eslint-kit-cli.git",
   "private": true,
   "license": "MIT",
+  "bin": {
+    "eslint-kit-cli": "dist/main.js"
+  },
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
@@ -15,27 +18,29 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@cspotcode/zx": "^6.1.0",
+    "@cjs-mifi-test/execa": "^6.0.0",
     "@nestjs/common": "^8.0.0",
     "@nestjs/config": "^2.0.0",
     "@nestjs/core": "^8.0.0",
     "@nestjs/platform-express": "^8.0.0",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",
+    "chalk": "4",
+    "eslint": "^8.16.0",
     "inquirer": "^8.2.4",
     "jscodeshift": "^0.13.1",
     "nest-commander": "^2.5.0",
+    "ora": "5.4.1",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
-    "rxjs": "^7.2.0",
-    "zx": "5"
+    "rxjs": "^7.2.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
@@ -47,7 +52,7 @@
     "@types/jest": "27.5.0",
     "@types/jscodeshift": "^0.11.5",
     "@types/node": "^16.0.0",
-    "eslint-kit": "^1.0.3",
+    "eslint-kit": "^3.0.0",
     "jest": "28.0.3",
     "source-map-support": "^0.5.20",
     "ts-jest": "28.0.1",

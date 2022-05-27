@@ -1,5 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
+import chalk from 'chalk'
+import { ESLint } from 'eslint'
 import { Command, CommandRunner } from 'nest-commander'
 import {
   createEslintKitBuilder,
@@ -30,6 +32,13 @@ export class InitCommand implements CommandRunner {
     if (eslintConfigLocation) {
       const canReplace = await askForReplacePermission()
       if (!canReplace) return
+    }
+
+    const overlappingDependencies =
+      await this.meta.findOverlappingDependencies()
+
+    if (overlappingDependencies.length > 0) {
+      await this.manager.delete(overlappingDependencies)
     }
 
     const hasEslintKit = await this.meta.hasEslintKit()
@@ -100,5 +109,19 @@ export class InitCommand implements CommandRunner {
     }
 
     await builder.write(eslintConfig)
+
+    const cli = new ESLint({
+      cwd: process.cwd(),
+      useEslintrc: true,
+      ignore: false,
+      fix: true,
+    })
+
+    const [result] = await cli.lintFiles('.eslintrc.js')
+    if (result.output) await writeFile('.eslintrc.js', result.output)
+
+    console.info(
+      chalk.green('ESLint Kit installation is complete. Happy usage!')
+    )
   }
 }

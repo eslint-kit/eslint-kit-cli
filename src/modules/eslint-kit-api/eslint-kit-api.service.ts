@@ -12,6 +12,20 @@ export class EslintKitApiService {
     return new Set<string>(response.data)
   }
 
+  public async fetchOldEslintKitDependencies() {
+    return new Set<string>(
+      [
+        'base',
+        'node',
+        'patch',
+        'prettier',
+        'react',
+        'react-new-jsx-transform',
+        'typescript',
+      ].map((name) => `@eslint-kit/eslint-config-${name}`)
+    )
+  }
+
   public async fetchPrettierRecommended() {
     const response = await repo.get('/prettier-recommended.json')
     return response.data

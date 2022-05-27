@@ -1,4 +1,4 @@
-import '@cspotcode/zx'
+import { execa } from '@cjs-mifi-test/execa'
 import ora from 'ora'
 import { joinArguments } from '../commands'
 import { readJson } from '../fs'
@@ -13,14 +13,13 @@ export abstract class AbstractPackageManager {
     return this.commandBase.toUpperCase()
   }
 
-  public async run(args: string) {
-    const output = await $`${this.commandBase} ${args}`
+  public async run(args: string[]) {
+    const output = await execa(this.commandBase, args)
     return output.stdout
   }
 
   public async version(): Promise<string> {
-    const commandArguments = '--version'
-    return this.run(commandArguments)
+    return this.run(['--version'])
   }
 
   public async addProduction(
@@ -28,24 +27,24 @@ export abstract class AbstractPackageManager {
   ): Promise<boolean> {
     const command = joinArguments([this.cli.add, this.cli.saveFlag])
 
-    const commandArguments = dependencies
-      .map(({ name, version }) => `${name}@${version}`)
-      .join(' ')
+    const commandArguments = dependencies.map(
+      ({ name, version }) => `${name}@${version}`
+    )
 
-    return this.add(`${command} ${commandArguments}`)
+    return this.add([command, ...commandArguments])
   }
 
   public async addDevelopment(dependencies: ProjectDependency[]) {
     const command = joinArguments([this.cli.add, this.cli.saveDevFlag])
 
-    const commandArguments = dependencies
-      .map(({ name, version }) => `${name}@${version}`)
-      .join(' ')
+    const commandArguments = dependencies.map(
+      ({ name, version }) => `${name}@${version}`
+    )
 
-    await this.add(`${command} ${commandArguments}`)
+    await this.add([command, ...commandArguments])
   }
 
-  private async add(commandArguments: string) {
+  private async add(commandArguments: string[]) {
     const spinner = ora({
       spinner: 'dots',
       text: 'Installing dependencies..',
@@ -55,10 +54,10 @@ export abstract class AbstractPackageManager {
 
     try {
       await this.run(commandArguments)
-      spinner.succeed()
+      spinner.succeed('Successfully added dependencies')
       return true
     } catch {
-      spinner.fail()
+      spinner.fail('Dependencies adding failed')
       return false
     }
   }
@@ -92,16 +91,14 @@ export abstract class AbstractPackageManager {
   }
 
   public async updateProduction(dependencies: string[]) {
-    const commandArguments = `${this.cli.update} ${dependencies.join(' ')}`
-    await this.update(commandArguments)
+    await this.update([this.cli.update, ...dependencies])
   }
 
   public async updateDevelopment(dependencies: string[]) {
-    const commandArguments = `${this.cli.update} ${dependencies.join(' ')}`
-    await this.update(commandArguments)
+    await this.update([this.cli.update, ...dependencies])
   }
 
-  private async update(commandArguments: string) {
+  private async update(commandArguments: string[]) {
     const spinner = ora({
       spinner: 'dots',
       text: 'Updating dependencies..',
@@ -111,37 +108,25 @@ export abstract class AbstractPackageManager {
 
     try {
       await this.run(commandArguments)
-      spinner.succeed()
+      spinner.succeed('Successfully updated dependencies')
       return true
     } catch {
-      spinner.fail()
+      spinner.fail('Dependencies updating failed')
       return false
     }
   }
 
   public async upgradeProduction(dependencies: ProjectDependency[]) {
-    await this.deleteProduction(dependencies.map((dep) => dep.name))
+    await this.delete(dependencies.map((dep) => dep.name))
     await this.addProduction(dependencies)
   }
 
   public async upgradeDevelopment(dependencies: ProjectDependency[]) {
-    await this.deleteProduction(dependencies.map((dep) => dep.name))
+    await this.delete(dependencies.map((dep) => dep.name))
     await this.addDevelopment(dependencies)
   }
 
-  public async deleteProduction(dependencies: string[]) {
-    const command: string = joinArguments([this.cli.remove, this.cli.saveFlag])
-    const commandArguments: string = dependencies.join(' ')
-    await this.delete(`${command} ${commandArguments}`)
-  }
-
-  public async deleteDevelopment(dependencies: string[]) {
-    const command = joinArguments([this.cli.remove, this.cli.saveDevFlag])
-    const commandArguments: string = dependencies.join(' ')
-    await this.delete(`${command} ${commandArguments}`)
-  }
-
-  public async delete(commandArguments: string) {
+  public async delete(dependencies: string[]) {
     const spinner = ora({
       spinner: 'dots',
       text: 'Deleting dependencies..',
@@ -150,11 +135,11 @@ export abstract class AbstractPackageManager {
     spinner.start()
 
     try {
-      await this.run(commandArguments)
-      spinner.succeed()
+      await this.run([this.cli.remove, ...dependencies])
+      spinner.succeed('Successfully deleted dependencies')
       return true
     } catch {
-      spinner.fail()
+      spinner.fail('Dependencies deleting failed')
       return false
     }
   }

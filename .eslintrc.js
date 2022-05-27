@@ -7,14 +7,4 @@ module.exports = configure({
     presets.typescript(),
     presets.alias(),
   ],
-  extend: {
-    overrides: [
-      {
-        files: ['*.ts'],
-        rules: {
-          '@typescript-eslint/no-unnecessary-condition': 'off',
-        },
-      },
-    ],
-  },
 })
