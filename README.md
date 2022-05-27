@@ -1,30 +1,34 @@
-# API For Social Network
+<p align="center">
+  <img src="logo.svg" width="280" align="center" alt="ESLint Kit" style="max-width: 100%;" />
+  <h1></h1>
+  <p align="center">
+    ✨ All-in-one solution for configuring ESLint in all of your projects ✨
+  </p>
+</p>
+<br/>
+<p align="center">
+  <a href="https://github.com/eslint-kit/eslint-kit/actions?query=branch%3Amain">
+    <img src="https://github.com/eslint-kit/eslint-kit/actions/workflows/test-and-build.yml/badge.svg?event=push&branch=main" alt="eslint-kit CI Status" />
+  </a>
+  <a href="https://opensource.org/licenses/MIT" rel="nofollow">
+    <img src="https://img.shields.io/github/license/eslint-kit/eslint-kit" alt="License">
+  </a>
+  <a href="https://www.npmjs.com/package/eslint-kit" rel="nofollow">
+    <img src="https://img.shields.io/npm/dw/eslint-kit.svg" alt="npm">
+  </a>
+  <a href="https://www.npmjs.com/package/eslint-kit" rel="nofollow">
+    <img src="https://img.shields.io/github/stars/eslint-kit/eslint-kit" alt="stars">
+  </a>
+</p>
 
-## Developing
+## Before you start
 
-Prerequisites:
+The README on `main` branch can contain some unreleased changes.
 
-- [Docker](https://www.docker.com/get-started)
+Go to [`release/latest`](https://github.com/eslint-kit/eslint-kit-cli/tree/release/latest) branch to see the actual README for the latest version from NPM.
 
-Running locally:
+## Usage
 
-1. Create `.env` file: `cp .env.example .env`
-   - You may need to fill/change some variables
-
-2. Launch postgres: `yarn start:docker`
-   - After finishing development, you can shut down the containers by running `yarn stop:docker`
-
-3. Wait for docker containers to start up
-
-4. Create and migrate the database: `yarn prisma migrate dev`
-   - You must run this command every time you make changes to `prisma/schema.prisma`
-
-5. Run the application in watch mode: `yarn start:dev`
-
-6. Congratulations! Now you can access the API on `http://localhost:5050`
-
-## API Reference (in progress)
-
-Swagger UI - `/api`
-
-OpenAPI JSON - `/api-json`
+```sh
+$ npx eslint-kit-cli
+```

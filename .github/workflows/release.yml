@@ -18,6 +18,7 @@ jobs:
         with:
           ref: ${{ github.event.release.tag_name }}
           fetch-depth: 0
+
       - name: Extract version
         id: tag
         uses: olegtarasov/get-tag@v2.1.1

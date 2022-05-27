@@ -5,6 +5,7 @@
   "author": "Evgeny Zakharov <risenforces@gmail.com>",
   "repository": "git@github.com:eslint-kit/eslint-kit-cli.git",
   "license": "MIT",
+  "files": ["dist/*"],
   "bin": {
     "eslint-kit-cli": "dist/main.js"
   },
