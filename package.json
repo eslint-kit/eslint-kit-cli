@@ -4,7 +4,6 @@
   "description": "Setup ESLint and Prettier with just one CLI command",
   "author": "Evgeny Zakharov <risenforces@gmail.com>",
   "repository": "git@github.com:eslint-kit/eslint-kit-cli.git",
-  "private": true,
   "license": "MIT",
   "bin": {
     "eslint-kit-cli": "dist/main.js"
