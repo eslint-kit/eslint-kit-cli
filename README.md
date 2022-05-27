@@ -30,5 +30,5 @@ Go to [`release/latest`](https://github.com/eslint-kit/eslint-kit-cli/tree/relea
 ## Usage
 
 ```sh
-$ npx eslint-kit-cli
+$ npx eslint-kit-cli@latest
 ```
