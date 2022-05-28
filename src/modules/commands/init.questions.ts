@@ -8,7 +8,7 @@ export async function askForReplacePermission(): Promise<boolean> {
       {
         name,
         type: 'confirm',
-        default: false,
+        default: true,
         message:
           'You already have ESLint config in your project. ' +
           'Do you want to override it with eslint-kit?',
