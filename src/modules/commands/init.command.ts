@@ -115,8 +115,16 @@ export class InitCommand implements CommandRunner {
       cwd: process.cwd(),
     })
 
+    console.info()
     console.info(
       chalk.green('ESLint Kit installation is complete. Happy usage!')
+    )
+    console.info()
+    console.info(
+      chalk.yellow(
+        'To learn how to configure your editor for using with ESLint, check this out:'
+      ),
+      'https://github.com/eslint-kit/eslint-kit/tree/release#setting-up-editors'
     )
   }
 }
