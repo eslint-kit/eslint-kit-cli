@@ -61,6 +61,7 @@ export class InitCommand implements CommandRunner {
 
     const presets: Preset[] = []
 
+    presets.push(builder.preset('imports'))
     presets.push(builder.preset('node'))
     presets.push(builder.preset('prettier'))
 
@@ -90,10 +91,6 @@ export class InitCommand implements CommandRunner {
 
     if (await this.meta.hasEffector()) {
       presets.push(builder.preset('effector'))
-    }
-
-    if (await this.meta.hasAliases()) {
-      presets.push(builder.preset('alias'))
     }
 
     const eslintConfig = builder.config([builder.presets(presets)])

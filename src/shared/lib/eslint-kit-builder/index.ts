@@ -6,4 +6,4 @@ export const createEslintKitBuilder = () => ({
   write: writeEslintKitConfig,
 })
 
-export type { Preset, Config } from './builders'
+export type { Config, Preset } from './builders'
