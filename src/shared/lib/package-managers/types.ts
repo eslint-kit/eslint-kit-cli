@@ -6,7 +6,7 @@ export enum PackageManager {
 
 export interface ProjectDependency {
   name: string
-  version: string
+  version?: string
 }
 
 export interface PackageManagerCommands {
