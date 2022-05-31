@@ -1,6 +1,7 @@
 import execa from 'execa'
 import ora from 'ora'
 import { readJson } from '../fs'
+import { stringifyDependencies } from './stringify-dependencies'
 import { PackageManagerCommands, ProjectDependency } from './types'
 
 export abstract class AbstractPackageManager {
@@ -24,18 +25,12 @@ export abstract class AbstractPackageManager {
   public async addProduction(
     dependencies: ProjectDependency[]
   ): Promise<boolean> {
-    const commandArguments = dependencies.map(
-      ({ name, version }) => `${name}@${version}`
-    )
-
+    const commandArguments = stringifyDependencies(dependencies)
     return this.add([this.cli.add, this.cli.saveFlag, ...commandArguments])
   }
 
   public async addDevelopment(dependencies: ProjectDependency[]) {
-    const commandArguments = dependencies.map(
-      ({ name, version }) => `${name}@${version}`
-    )
-
+    const commandArguments = stringifyDependencies(dependencies)
     await this.add([this.cli.add, this.cli.saveDevFlag, ...commandArguments])
   }
 
