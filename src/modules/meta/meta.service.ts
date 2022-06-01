@@ -35,6 +35,10 @@ export class MetaService {
     return this.hasProdDependency('next')
   }
 
+  public async hasRemix() {
+    return this.hasProdDependency('@remix-run/react')
+  }
+
   public async hasVue() {
     return this.hasProdDependency('vue')
   }

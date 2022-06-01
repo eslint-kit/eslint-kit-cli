@@ -80,6 +80,10 @@ export class InitCommand implements CommandRunner {
       presets.push(builder.preset('nextJs'))
     }
 
+    if (await this.meta.hasRemix()) {
+      presets.push(builder.preset('remix'))
+    }
+
     if (await this.meta.hasVue()) {
       presets.push(builder.preset('vue'))
     }
