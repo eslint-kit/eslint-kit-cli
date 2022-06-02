@@ -37,9 +37,11 @@ export class InitCommand implements CommandRunner {
     const overlappingDependencies =
       await this.meta.findOverlappingDependencies()
 
-    const hasEslintKit = await this.meta.hasEslintKit()
+    if (await this.meta.hasEslint()) {
+      overlappingDependencies.push('eslint')
+    }
 
-    if (hasEslintKit) {
+    if (await this.meta.hasEslintKit()) {
       overlappingDependencies.push('eslint-kit')
     }
 
