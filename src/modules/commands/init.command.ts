@@ -34,19 +34,18 @@ export class InitCommand implements CommandRunner {
       if (!canReplace) return
     }
 
-    const overlappingDependencies =
-      await this.meta.findOverlappingDependencies()
+    const dependenciesToDelete = await this.meta.findOverlappingDependencies()
 
     if (await this.meta.hasEslint()) {
-      overlappingDependencies.push('eslint')
+      dependenciesToDelete.push('eslint')
     }
 
     if (await this.meta.hasEslintKit()) {
-      overlappingDependencies.push('eslint-kit')
+      dependenciesToDelete.push('eslint-kit')
     }
 
-    if (overlappingDependencies.length > 0) {
-      await this.manager.delete(overlappingDependencies)
+    if (dependenciesToDelete.length > 0) {
+      await this.manager.delete(dependenciesToDelete)
     }
 
     await this.manager.addDevelopment([
@@ -117,9 +116,20 @@ export class InitCommand implements CommandRunner {
 
     await builder.write(eslintConfig)
 
-    await execa('yarn', ['eslint', '--no-ignore', '--fix', '.eslintrc.js'], {
-      cwd: process.cwd(),
-    })
+    try {
+      await execa('yarn', ['eslint', '--no-ignore', '--fix', '.eslintrc.js'], {
+        cwd: process.cwd(),
+      })
+    } catch {
+      console.info()
+      console.info(
+        chalk.red(
+          `Failed to lint .eslintrc.json.` +
+            ` Most likely it's the monorepo issue -` +
+            ` try setting "extend.root" to "true" and lint again`
+        )
+      )
+    }
 
     console.info()
     console.info(
