@@ -124,7 +124,7 @@ export class InitCommand implements CommandRunner {
       console.info()
       console.info(
         chalk.red(
-          `Failed to lint .eslintrc.json.` +
+          `Failed to lint .eslintrc.js.` +
             ` Most likely it's the monorepo issue -` +
             ` try setting "extend.root" to "true" and lint again`
         )
