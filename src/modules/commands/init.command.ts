@@ -101,32 +101,36 @@ export class InitCommand implements CommandRunner {
       presets.push(builder.preset('effector'))
     }
 
+    const packageJson = await readJson('package.json')
     const eslintConfig = builder.config([builder.presets(presets)])
 
     /*
      * Remove existing ESLint configuration
      */
     if (eslintConfigLocation === 'package.json') {
-      const packageJson = await readJson('package.json')
       delete packageJson?.eslintConfig
       await writeFile('package.json', JSON.stringify(packageJson, null, 2))
     } else if (eslintConfigLocation) {
       await removeFile(eslintConfigLocation)
     }
 
-    await builder.write(eslintConfig)
+    const eslintrcName =
+      packageJson?.type === 'module' ? '.eslintrc.cjs' : '.eslintrc.js'
+
+    await builder.write(eslintConfig, eslintrcName)
 
     try {
-      await execa('yarn', ['eslint', '--no-ignore', '--fix', '.eslintrc.js'], {
+      await execa('yarn', ['eslint', '--no-ignore', '--fix', eslintrcName], {
         cwd: process.cwd(),
       })
     } catch {
       console.info()
       console.info(
         chalk.red(
-          `Failed to lint .eslintrc.js.` +
-            ` Most likely it's the monorepo issue -` +
-            ` try setting "extend.root" to "true" and lint again`
+          `Failed to lint ${eslintrcName}.` +
+            ` Most likely it's the monorepo / typescript issue -` +
+            ` please inspect the error and check out Common Issues section:` +
+            ` https://github.com/eslint-kit/eslint-kit#common-issues`
         )
       )
     }

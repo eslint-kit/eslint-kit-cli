@@ -3,6 +3,7 @@ import path from 'path'
 
 export interface PackageJson {
   version: string
+  type?: 'module' | 'commonjs'
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
   eslintConfig?: Record<string, unknown>
