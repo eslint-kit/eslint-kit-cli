@@ -1,7 +1,7 @@
 import { writeFile } from '../fs'
 import { Config, toSource } from './builders'
 
-export function writeEslintKitConfig(config: Config) {
+export function writeEslintKitConfig(config: Config, fileName: string) {
   const source = toSource(config)
-  return writeFile('.eslintrc.js', source)
+  return writeFile(fileName, source)
 }
