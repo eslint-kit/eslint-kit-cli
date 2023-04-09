@@ -44,8 +44,16 @@ const configure = (properties: j.Property[]) => {
   )
 }
 
-export const config = (preperties: j.Property[]) => {
-  return j.program([imports, configure(preperties)])
+export const allowDebugFromEnv = () => {
+  return j.property.from({
+    kind: 'init',
+    key: j.identifier('allowDebug'),
+    value: j.identifier(`process.env.NODE_ENV !== "production"`),
+  })
+}
+
+export const config = (properties: j.Property[]) => {
+  return j.program([imports, configure(properties)])
 }
 
 export const toSource = (config: Config) => {
