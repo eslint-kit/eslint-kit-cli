@@ -102,7 +102,7 @@ export class InitCommand implements CommandRunner {
     }
 
     const packageJson = await readJson('package.json')
-    const eslintConfig = builder.config([builder.presets(presets)])
+    const eslintConfig = builder.config([builder.allowDebugFromEnv(), builder.presets(presets)])
 
     /*
      * Remove existing ESLint configuration
