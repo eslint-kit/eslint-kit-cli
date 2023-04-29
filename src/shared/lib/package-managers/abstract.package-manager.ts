@@ -63,6 +63,17 @@ export abstract class AbstractPackageManager {
     }))
   }
 
+  public async getPeer(): Promise<ProjectDependency[]> {
+    const packageJson = await readJson('package.json')
+    if (!packageJson) return []
+
+    const { peerDependencies = [] } = packageJson
+    return Object.entries(peerDependencies).map(([name, version]) => ({
+      name,
+      version,
+    }))
+  }
+
   public async getDevelopment(): Promise<ProjectDependency[]> {
     const packageJson = await readJson('package.json')
     if (!packageJson) return []

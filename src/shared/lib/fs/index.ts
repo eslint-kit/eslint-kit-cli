@@ -5,6 +5,7 @@ export interface PackageJson {
   version: string
   type?: 'module' | 'commonjs'
   dependencies?: Record<string, string>
+  peerDependencies?: Record<string, string>
   devDependencies?: Record<string, string>
   eslintConfig?: Record<string, unknown>
   prettier?: Record<string, unknown>
