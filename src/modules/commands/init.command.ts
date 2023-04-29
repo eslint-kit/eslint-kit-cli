@@ -87,11 +87,7 @@ export class InitCommand implements CommandRunner {
       await this.manager.delete(dependenciesToDelete)
     }
 
-    await this.manager.addDevelopment([
-      { name: 'eslint-kit' },
-      { name: 'eslint' },
-      { name: 'prettier' },
-    ])
+    await this.manager.addDevelopment(dependenciesToInstall)
 
     if (canWritePrettier) {
       const writePrettierRecommended = async () => {
@@ -198,9 +194,16 @@ export class InitCommand implements CommandRunner {
     await builder.write(eslintConfig, eslintrcName)
 
     try {
-      await execa('yarn', ['eslint', '--no-ignore', '--fix', eslintrcName], {
-        cwd: process.cwd(),
-      })
+      if (this.manager.name === 'NPM') {
+        console.info()
+        console.info(
+          chalk.yellow(
+            `Cannot lint ${eslintrcName} using npm. You may do it manually or use yarn / pnpm`
+          )
+        )
+      } else {
+        await this.manager.run(['eslint', '--no-ignore', '--fix', eslintrcName])
+      }
     } catch {
       console.info()
       console.info(
