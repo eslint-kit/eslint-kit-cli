@@ -14,7 +14,7 @@ import { EslintKitApiService } from '../eslint-kit-api'
 import { MetaService } from '../meta'
 import { InjectPackageManager } from '../package-manager'
 import {
-  askForPackageJsonCommands,
+  askAboutPackageJsonScripts,
   askForPrettierOverride,
   askForReplacePermission,
   confirmDependencies,
@@ -46,10 +46,13 @@ export class InitCommand implements CommandRunner {
     const canWritePrettier =
       !prettierLocation || (await askForPrettierOverride())
 
-    const canAddPackageJsonCommands =
-      !packageJson.scripts?.lint &&
-      !packageJson.scripts?.['lint:fix'] &&
-      (await askForPackageJsonCommands())
+    const hasLintScripts = Boolean(
+      packageJson.scripts?.lint || packageJson.scripts?.['lint:fix']
+    )
+
+    const canAddLintScripts = hasLintScripts
+      ? await askAboutPackageJsonScripts('replace')
+      : await askAboutPackageJsonScripts('add')
 
     const dependenciesToDelete = await this.meta.findOverlappingDependencies()
 
@@ -165,7 +168,7 @@ export class InitCommand implements CommandRunner {
       presets.push(builder.preset('effector'))
     }
 
-    if (canAddPackageJsonCommands) {
+    if (canAddLintScripts) {
       const scripts = packageJson.scripts ?? {}
       const ext = Array.from(extensions).join(',')
       const dir = Array.from(directories).join(' ')

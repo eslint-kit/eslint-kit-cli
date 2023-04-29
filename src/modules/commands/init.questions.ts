@@ -34,17 +34,20 @@ export async function askForPrettierOverride(): Promise<boolean> {
     .then((answers) => answers[name])
 }
 
-export async function askForPackageJsonCommands(): Promise<boolean> {
+export async function askAboutPackageJsonScripts(
+  action: 'add' | 'replace'
+): Promise<boolean> {
   const name = 'allowed'
+
+  const canSafelyAdd = action === 'add'
 
   return inquirer
     .prompt([
       {
         name,
         type: 'confirm',
-        default: true,
-        message:
-          'Do you want to add "lint" and "lint:fix" scripts to your package.json?',
+        default: canSafelyAdd,
+        message: `Do you want to ${action} "lint" and "lint:fix" scripts to your package.json?`,
       },
     ])
     .then((answers) => answers[name])
