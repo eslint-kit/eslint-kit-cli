@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common'
-import { hasFile, readJson } from '@app/shared/lib/fs'
+import chalk from 'chalk'
+import * as process from 'process'
+import { hasFile, PackageJson, readJson, writeFile } from '@app/shared/lib/fs'
 import { AbstractPackageManager } from '@app/shared/lib/package-managers'
 import { EslintKitApiService } from '../eslint-kit-api'
 import { InjectPackageManager } from '../package-manager'
@@ -68,7 +70,7 @@ export class MetaService {
   }
 
   public async hasTypeScript() {
-    return this.hasDevDependency('typescript')
+    return this.hasDependency('typescript')
   }
 
   public async hasEslint() {
@@ -98,14 +100,41 @@ export class MetaService {
     return null
   }
 
+  public async readPackageJson(): Promise<PackageJson> {
+    const packageJson = await readJson('package.json')
+
+    if (!packageJson) {
+      console.info()
+      console.info(
+        chalk.red(
+          `Failed to find package.json.` +
+            ` Please check your terminal session location`
+        )
+      )
+      process.exit(1)
+    }
+
+    return packageJson
+  }
+
+  public async updatePackageJsonField<T extends keyof PackageJson>(
+    field: T,
+    value: PackageJson[T]
+  ) {
+    const json = await this.readPackageJson()
+    delete json[field]
+    json[field] = value
+    await writeFile('package.json', JSON.stringify(json, null, 2))
+  }
+
   public async hasEslintConfig() {
     return (await this.findEslintConfigLocation()) !== null
   }
 
   public async findPrettierConfigLocation() {
-    const packageJson = await readJson('package.json')
+    const packageJson = await this.readPackageJson()
 
-    if (packageJson?.prettier) {
+    if (packageJson.prettier) {
       return 'package.json' as const
     }
 
@@ -153,7 +182,7 @@ export class MetaService {
   }
 
   public async hasAliases() {
-    const packageJson = await readJson('package.json')
+    const packageJson = await this.readPackageJson()
     const jsconfig = await readJson('jsconfig.json')
     const tsconfig = await readJson('tsconfig.json')
 
@@ -162,7 +191,7 @@ export class MetaService {
         jsconfig?.compilerOptions?.paths ||
         tsconfig?.compilerOptions?.baseUrl ||
         tsconfig?.compilerOptions?.paths ||
-        packageJson?._moduleAliases
+        packageJson._moduleAliases
     )
   }
 }
