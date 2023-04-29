@@ -23,50 +23,54 @@ export class MetaService {
     return dependencies.find((item) => item.name === name) !== undefined
   }
 
+  private async hasPeerDependency(name: string) {
+    const dependencies = await this.manager.getPeer()
+    return dependencies.find((item) => item.name === name) !== undefined
+  }
+
   private async hasDependency(name: string) {
     const hasProd = await this.hasProdDependency(name)
+    const hasPeer = await this.hasPeerDependency(name)
     const hasDev = await this.hasDevDependency(name)
-    return hasProd || hasDev
+    return hasProd || hasPeer || hasDev
+  }
+
+  private async hasRuntimeDependency(name: string) {
+    const hasProd = await this.hasProdDependency(name)
+    const hasPeer = await this.hasPeerDependency(name)
+    return hasProd || hasPeer
   }
 
   public async hasReact() {
-    return this.hasProdDependency('react')
+    return this.hasRuntimeDependency('react')
   }
 
   public async hasNextJs() {
-    return this.hasProdDependency('next')
+    return this.hasRuntimeDependency('next')
   }
 
   public async hasRemix() {
-    return this.hasProdDependency('@remix-run/react')
+    return this.hasRuntimeDependency('@remix-run/react')
   }
 
   public async hasVue() {
-    return this.hasProdDependency('vue')
+    return this.hasRuntimeDependency('vue')
   }
 
   public async hasSolidJs() {
-    return this.hasProdDependency('solid-js')
+    return this.hasRuntimeDependency('solid-js')
   }
 
   public async hasSvelte() {
-    return this.hasProdDependency('svelte')
+    return this.hasRuntimeDependency('svelte')
   }
 
   public async hasEffector() {
-    return this.hasProdDependency('effector')
-  }
-
-  public async isNextJs() {
-    return this.hasDependency('next')
-  }
-
-  public async isCRA() {
-    return this.hasDependency('react-scripts')
+    return this.hasRuntimeDependency('effector')
   }
 
   public async hasEslintKit() {
-    return this.hasDevDependency('eslint-kit')
+    return this.hasDependency('eslint-kit')
   }
 
   public async hasTypeScript() {
@@ -74,7 +78,7 @@ export class MetaService {
   }
 
   public async hasEslint() {
-    return this.hasDevDependency('eslint')
+    return this.hasDependency('eslint')
   }
 
   public async findEslintConfigLocation() {
@@ -124,7 +128,40 @@ export class MetaService {
     const json = await this.readPackageJson()
     delete json[field]
     json[field] = value
-    await writeFile('package.json', JSON.stringify(json, null, 2))
+
+    const order: Array<keyof PackageJson> = [
+      'scripts',
+      'dependencies',
+      'peerDependencies',
+      'devDependencies',
+      '_moduleAliases',
+      'eslintConfig',
+      'prettier',
+    ]
+
+    const byOrder = (a: keyof PackageJson, b: keyof PackageJson): number => {
+      const orderA = order.indexOf(a)
+      const orderB = order.indexOf(b)
+      return orderA - orderB
+    }
+
+    function keysDeep(object: unknown) {
+      const keys: string[] = []
+
+      if (typeof object === 'object') {
+        for (const key in object) {
+          keys.push(key)
+          keys.push(...keysDeep(object[key]))
+        }
+      }
+
+      return keys
+    }
+
+    await writeFile(
+      'package.json',
+      JSON.stringify(json, keysDeep(json).sort(byOrder), 2)
+    )
   }
 
   public async hasEslintConfig() {
