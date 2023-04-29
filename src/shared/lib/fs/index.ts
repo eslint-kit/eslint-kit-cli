@@ -7,7 +7,8 @@ export interface PackageJson {
   dependencies?: Record<string, string>
   devDependencies?: Record<string, string>
   eslintConfig?: Record<string, unknown>
-  prettier: Record<string, unknown>
+  prettier?: Record<string, unknown>
+  scripts?: Record<string, string>
   _moduleAliases?: Record<string, string>
 }
 

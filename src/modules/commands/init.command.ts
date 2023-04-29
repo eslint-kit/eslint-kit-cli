@@ -7,12 +7,16 @@ import {
   createEslintKitBuilder,
   Preset,
 } from '@app/shared/lib/eslint-kit-builder'
-import { readJson, removeFile, writeFile } from '@app/shared/lib/fs'
+import { removeFile } from '@app/shared/lib/fs'
 import { AbstractPackageManager } from '@app/shared/lib/package-managers'
 import { EslintKitApiService } from '../eslint-kit-api'
 import { MetaService } from '../meta'
 import { InjectPackageManager } from '../package-manager'
-import { askForReplacePermission } from './init.questions'
+import {
+  askForPackageJsonCommands,
+  askForPrettierOverride,
+  askForReplacePermission,
+} from './init.questions'
 
 @Command({
   name: 'init',
@@ -27,6 +31,8 @@ export class InitCommand implements CommandRunner {
   ) {}
 
   async run() {
+    const packageJson = await this.meta.readPackageJson()
+
     const eslintConfigLocation = await this.meta.findEslintConfigLocation()
 
     if (eslintConfigLocation) {
@@ -53,17 +59,32 @@ export class InitCommand implements CommandRunner {
       { name: 'eslint-kit' },
     ])
 
-    const hasPrettierConfig = await this.meta.hasPrettierConfig()
+    const prettierLocation = await this.meta.findPrettierConfigLocation()
 
-    if (!hasPrettierConfig) {
+    const writePrettierRecommended = async () => {
       const recommended = await this.eslintKitAPI.fetchPrettierRecommended()
       const location = path.resolve(process.cwd(), '.prettierrc')
       await fs.writeFile(location, JSON.stringify(recommended, null, 2))
     }
 
+    if (!prettierLocation) {
+      await writePrettierRecommended()
+    } else if (await askForPrettierOverride()) {
+      if (prettierLocation === 'package.json') {
+        const recommended = await this.eslintKitAPI.fetchPrettierRecommended()
+        await this.meta.updatePackageJsonField('prettier', recommended)
+      } else {
+        const old = path.resolve(process.cwd(), prettierLocation)
+        await fs.unlink(old)
+        await writePrettierRecommended()
+      }
+    }
+
     const builder = createEslintKitBuilder()
 
     const presets: Preset[] = []
+    const extensions: Set<string> = new Set()
+    const directories: Set<string> = new Set(['src'])
 
     presets.push(builder.preset('imports'))
     presets.push(builder.preset('node'))
@@ -71,51 +92,80 @@ export class InitCommand implements CommandRunner {
 
     if (await this.meta.hasTypeScript()) {
       presets.push(builder.preset('typescript'))
+      extensions.add('.js').add('.ts')
     }
 
     if (await this.meta.hasReact()) {
       presets.push(builder.preset('react'))
+      extensions.add('.jsx')
+
+      if (await this.meta.hasTypeScript()) {
+        extensions.add('.tsx')
+      }
     }
 
     if (await this.meta.hasNextJs()) {
       presets.push(builder.preset('nextJs'))
+      directories.add('pages').add('app').add('lib')
     }
 
     if (await this.meta.hasRemix()) {
       presets.push(builder.preset('remix'))
+      directories.add('app').add('server')
     }
 
     if (await this.meta.hasVue()) {
       presets.push(builder.preset('vue'))
+      extensions.add('.vue')
     }
 
     if (await this.meta.hasSolidJs()) {
       presets.push(builder.preset('solidJs'))
+      extensions.add('.jsx')
+
+      if (await this.meta.hasTypeScript()) {
+        extensions.add('.tsx')
+      }
     }
 
     if (await this.meta.hasSvelte()) {
       presets.push(builder.preset('svelte'))
+      extensions.add('.svelte')
     }
 
     if (await this.meta.hasEffector()) {
       presets.push(builder.preset('effector'))
     }
 
-    const packageJson = await readJson('package.json')
-    const eslintConfig = builder.config([builder.allowDebugFromEnv(), builder.presets(presets)])
+    if (
+      !packageJson.scripts?.lint &&
+      !packageJson.scripts?.['lint:fix'] &&
+      (await askForPackageJsonCommands())
+    ) {
+      const scripts = packageJson.scripts ?? {}
+      const ext = Array.from(extensions).join(',')
+      const dir = Array.from(directories).join(' ')
+      scripts.lint = `eslint --ext ${ext} ${dir}`
+      scripts['lint:fix'] = `eslint --ext ${ext} ${dir} --fix`
+      await this.meta.updatePackageJsonField('scripts', scripts)
+    }
+
+    const eslintConfig = builder.config([
+      builder.allowDebugFromEnv(),
+      builder.presets(presets),
+    ])
 
     /*
      * Remove existing ESLint configuration
      */
     if (eslintConfigLocation === 'package.json') {
-      delete packageJson?.eslintConfig
-      await writeFile('package.json', JSON.stringify(packageJson, null, 2))
+      await this.meta.updatePackageJsonField('eslintConfig', undefined)
     } else if (eslintConfigLocation) {
       await removeFile(eslintConfigLocation)
     }
 
     const eslintrcName =
-      packageJson?.type === 'module' ? '.eslintrc.cjs' : '.eslintrc.js'
+      packageJson.type === 'module' ? '.eslintrc.cjs' : '.eslintrc.js'
 
     await builder.write(eslintConfig, eslintrcName)
 
