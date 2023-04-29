@@ -9,6 +9,7 @@ import {
 } from '@app/shared/lib/eslint-kit-builder'
 import { removeFile } from '@app/shared/lib/fs'
 import { AbstractPackageManager } from '@app/shared/lib/package-managers'
+import { ProjectDependency } from '../../shared/lib/package-managers/types'
 import { EslintKitApiService } from '../eslint-kit-api'
 import { MetaService } from '../meta'
 import { InjectPackageManager } from '../package-manager'
@@ -16,6 +17,7 @@ import {
   askForPackageJsonCommands,
   askForPrettierOverride,
   askForReplacePermission,
+  confirmDependencies,
 } from './init.questions'
 
 @Command({
@@ -40,6 +42,15 @@ export class InitCommand implements CommandRunner {
       if (!canReplace) return
     }
 
+    const prettierLocation = await this.meta.findPrettierConfigLocation()
+    const canWritePrettier =
+      !prettierLocation || (await askForPrettierOverride())
+
+    const canAddPackageJsonCommands =
+      !packageJson.scripts?.lint &&
+      !packageJson.scripts?.['lint:fix'] &&
+      (await askForPackageJsonCommands())
+
     const dependenciesToDelete = await this.meta.findOverlappingDependencies()
 
     if (await this.meta.hasEslint()) {
@@ -50,27 +61,48 @@ export class InitCommand implements CommandRunner {
       dependenciesToDelete.push('eslint-kit')
     }
 
+    const dependenciesToInstall: ProjectDependency[] = [
+      { name: 'eslint-kit' },
+      { name: 'eslint' },
+      { name: 'prettier' },
+    ]
+
+    console.info()
+    console.info(
+      chalk.hex('#ffffff').bgRed(' Will delete dependencies: '),
+      ...dependenciesToDelete.map((name) => chalk.red(`\n- ${name}`))
+    )
+
+    console.info()
+    console.info(
+      chalk.hex('#ffffff').bgGreen(' Will install dependencies: '),
+      ...dependenciesToInstall.map(({ name }) => chalk.green(`\n+ ${name}`))
+    )
+
+    console.info()
+    const proceed = await confirmDependencies()
+    if (!proceed) return
+
     if (dependenciesToDelete.length > 0) {
       await this.manager.delete(dependenciesToDelete)
     }
 
     await this.manager.addDevelopment([
-      { name: 'eslint' },
       { name: 'eslint-kit' },
+      { name: 'eslint' },
+      { name: 'prettier' },
     ])
 
-    const prettierLocation = await this.meta.findPrettierConfigLocation()
+    if (canWritePrettier) {
+      const writePrettierRecommended = async () => {
+        const recommended = await this.eslintKitAPI.fetchPrettierRecommended()
+        const location = path.resolve(process.cwd(), '.prettierrc')
+        await fs.writeFile(location, JSON.stringify(recommended, null, 2))
+      }
 
-    const writePrettierRecommended = async () => {
-      const recommended = await this.eslintKitAPI.fetchPrettierRecommended()
-      const location = path.resolve(process.cwd(), '.prettierrc')
-      await fs.writeFile(location, JSON.stringify(recommended, null, 2))
-    }
-
-    if (!prettierLocation) {
-      await writePrettierRecommended()
-    } else if (await askForPrettierOverride()) {
-      if (prettierLocation === 'package.json') {
+      if (!prettierLocation) {
+        await writePrettierRecommended()
+      } else if (prettierLocation === 'package.json') {
         const recommended = await this.eslintKitAPI.fetchPrettierRecommended()
         await this.meta.updatePackageJsonField('prettier', recommended)
       } else {
@@ -137,11 +169,7 @@ export class InitCommand implements CommandRunner {
       presets.push(builder.preset('effector'))
     }
 
-    if (
-      !packageJson.scripts?.lint &&
-      !packageJson.scripts?.['lint:fix'] &&
-      (await askForPackageJsonCommands())
-    ) {
+    if (canAddPackageJsonCommands) {
       const scripts = packageJson.scripts ?? {}
       const ext = Array.from(extensions).join(',')
       const dir = Array.from(directories).join(' ')
@@ -189,6 +217,7 @@ export class InitCommand implements CommandRunner {
     console.info(
       chalk.green('ESLint Kit installation is complete. Happy usage!')
     )
+
     console.info()
     console.info(
       chalk.yellow(
