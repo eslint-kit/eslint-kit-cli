@@ -49,3 +49,18 @@ export async function askForPackageJsonCommands(): Promise<boolean> {
     ])
     .then((answers) => answers[name])
 }
+
+export async function confirmDependencies(): Promise<boolean> {
+  const name = 'confirmed'
+
+  return inquirer
+    .prompt([
+      {
+        name,
+        type: 'confirm',
+        default: true,
+        message: 'Proceed?',
+      },
+    ])
+    .then((answers) => answers[name])
+}
