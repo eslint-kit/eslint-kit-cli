@@ -85,6 +85,7 @@ export class InitCommand implements CommandRunner {
     console.info()
     const proceed = await confirmDependencies()
     if (!proceed) return
+    console.info()
 
     if (dependenciesToDelete.length > 0) {
       await this.manager.delete(dependenciesToDelete)
@@ -123,15 +124,15 @@ export class InitCommand implements CommandRunner {
 
     if (await this.meta.hasTypeScript()) {
       presets.push(builder.preset('typescript'))
-      extensions.add('.js').add('.ts')
+      extensions.add('js').add('ts')
     }
 
     if (await this.meta.hasReact()) {
       presets.push(builder.preset('react'))
-      extensions.add('.jsx')
+      extensions.add('jsx')
 
       if (await this.meta.hasTypeScript()) {
-        extensions.add('.tsx')
+        extensions.add('tsx')
       }
     }
 
@@ -147,21 +148,21 @@ export class InitCommand implements CommandRunner {
 
     if (await this.meta.hasVue()) {
       presets.push(builder.preset('vue'))
-      extensions.add('.vue')
+      extensions.add('vue')
     }
 
     if (await this.meta.hasSolidJs()) {
       presets.push(builder.preset('solidJs'))
-      extensions.add('.jsx')
+      extensions.add('jsx')
 
       if (await this.meta.hasTypeScript()) {
-        extensions.add('.tsx')
+        extensions.add('tsx')
       }
     }
 
     if (await this.meta.hasSvelte()) {
       presets.push(builder.preset('svelte'))
-      extensions.add('.svelte')
+      extensions.add('svelte')
     }
 
     if (await this.meta.hasEffector()) {
@@ -170,10 +171,11 @@ export class InitCommand implements CommandRunner {
 
     if (canAddLintScripts) {
       const scripts = packageJson.scripts ?? {}
+      const dir = Array.from(directories).join(',')
       const ext = Array.from(extensions).join(',')
-      const dir = Array.from(directories).join(' ')
-      scripts.lint = `eslint --ext ${ext} ${dir}`
-      scripts['lint:fix'] = `eslint --ext ${ext} ${dir} --fix`
+      const glob = `"{${dir}}/**/*.{${ext}}"`
+      scripts.lint = `eslint ${glob}`
+      scripts['lint:fix'] = `eslint ${glob} --fix`
       await this.meta.updatePackageJsonField('scripts', scripts)
     }
 
