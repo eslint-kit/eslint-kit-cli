@@ -47,7 +47,7 @@ export async function askAboutPackageJsonScripts(
         name,
         type: 'confirm',
         default: canSafelyAdd,
-        message: `Do you want to ${action} "lint" and "lint:fix" scripts to your package.json?`,
+        message: `Do you want to ${action} "lint" and "lint:fix" package.json scripts?`,
       },
     ])
     .then((answers) => answers[name])
