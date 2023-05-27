@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common'
 import axios from 'axios'
 
 const repo = axios.create({
-  baseURL: 'https://raw.githubusercontent.com/eslint-kit/eslint-kit/release',
+  baseURL:
+    'https://raw.githubusercontent.com/eslint-kit/eslint-kit/release/latest',
 })
 
 @Injectable()
