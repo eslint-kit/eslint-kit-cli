@@ -9,7 +9,7 @@ export type ExtendedException = new () => HttpException
 
 export function extendException(
   factory: new (message: string) => HttpException,
-  extend: Extend
+  extend: Extend,
 ): ExtendedException {
   return class ExtendedException extends factory {
     code: string

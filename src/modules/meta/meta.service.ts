@@ -10,7 +10,7 @@ import { InjectPackageManager } from '../package-manager'
 export class MetaService {
   constructor(
     @InjectPackageManager() private manager: AbstractPackageManager,
-    private eslintKitAPI: EslintKitApiService
+    private eslintKitAPI: EslintKitApiService,
   ) {}
 
   private async hasProdDependency(name: string) {
@@ -112,8 +112,8 @@ export class MetaService {
       console.info(
         chalk.red(
           `Failed to find package.json.` +
-            ` Please check your terminal session location`
-        )
+            ` Please check your terminal session location`,
+        ),
       )
       process.exit(1)
     }
@@ -123,7 +123,7 @@ export class MetaService {
 
   public async updatePackageJsonField<T extends keyof PackageJson>(
     field: T,
-    value: PackageJson[T]
+    value: PackageJson[T],
   ) {
     const json = await this.readPackageJson()
     delete json[field]
@@ -160,7 +160,7 @@ export class MetaService {
 
     await writeFile(
       'package.json',
-      JSON.stringify(json, keysDeep(json).sort(byOrder), 2)
+      JSON.stringify(json, keysDeep(json).sort(byOrder), 2),
     )
   }
 
@@ -210,7 +210,7 @@ export class MetaService {
       .map((dependency) => dependency.name)
       .filter(
         (name) =>
-          includedDependencies.has(name) || oldEslintKitDependencies.has(name)
+          includedDependencies.has(name) || oldEslintKitDependencies.has(name),
       )
   }
 
@@ -228,7 +228,7 @@ export class MetaService {
         jsconfig?.compilerOptions?.paths ||
         tsconfig?.compilerOptions?.baseUrl ||
         tsconfig?.compilerOptions?.paths ||
-        packageJson._moduleAliases
+        packageJson._moduleAliases,
     )
   }
 }
