@@ -16,7 +16,7 @@ const imports = j.variableDeclaration('const', [
         shorthand: true,
       }),
     ]),
-    j.callExpression(j.identifier('require'), [j.literal('eslint-kit')])
+    j.callExpression(j.identifier('require'), [j.literal('eslint-kit')]),
   ),
 ])
 
@@ -24,7 +24,7 @@ const imports = j.variableDeclaration('const', [
 export const preset = (name: string, options?: Record<string, any>) => {
   return j.callExpression(
     j.memberExpression(j.identifier('presets'), j.identifier(name)),
-    options ? j(JSON.stringify(options)).nodes[0] : []
+    options ? j(JSON.stringify(options)).nodes[0] : [],
   )
 }
 
@@ -39,8 +39,8 @@ const configure = (properties: j.Property[]) => {
       j.memberExpression(j.identifier('module'), j.identifier('exports')),
       j.callExpression(j.identifier('configure'), [
         j.objectExpression(properties),
-      ])
-    )
+      ]),
+    ),
   )
 }
 

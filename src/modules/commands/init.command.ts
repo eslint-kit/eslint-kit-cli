@@ -1,7 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
 import chalk from 'chalk'
-import execa from 'execa'
 import { Command, CommandRunner } from 'nest-commander'
 import {
   createEslintKitBuilder,
@@ -10,6 +9,7 @@ import {
 import { removeFile } from '@app/shared/lib/fs'
 import { AbstractPackageManager } from '@app/shared/lib/package-managers'
 import { ProjectDependency } from '../../shared/lib/package-managers/types'
+import { Versions } from '../../shared/versions'
 import { EslintKitApiService } from '../eslint-kit-api'
 import { MetaService } from '../meta'
 import { InjectPackageManager } from '../package-manager'
@@ -29,7 +29,7 @@ export class InitCommand implements CommandRunner {
   constructor(
     @InjectPackageManager() private manager: AbstractPackageManager,
     private meta: MetaService,
-    private eslintKitAPI: EslintKitApiService
+    private eslintKitAPI: EslintKitApiService,
   ) {}
 
   async run() {
@@ -47,7 +47,7 @@ export class InitCommand implements CommandRunner {
       !prettierLocation || (await askForPrettierOverride())
 
     const hasLintScripts = Boolean(
-      packageJson.scripts?.lint || packageJson.scripts?.['lint:fix']
+      packageJson.scripts?.lint || packageJson.scripts?.['lint:fix'],
     )
 
     const canAddLintScripts = hasLintScripts
@@ -65,21 +65,21 @@ export class InitCommand implements CommandRunner {
     }
 
     const dependenciesToInstall: ProjectDependency[] = [
-      { name: 'eslint-kit@^9' },
-      { name: 'eslint@^8.41.0' },
-      { name: 'prettier@^2' },
+      { name: `eslint-kit@${Versions.ESLintKit}` },
+      { name: `eslint@${Versions.ESLint}` },
+      { name: `prettier@${Versions.Prettier}` },
     ]
 
     console.info()
     console.info(
       chalk.hex('#ffffff').bgRed(' Will delete dependencies: '),
-      ...dependenciesToDelete.map((name) => chalk.red(`\n- ${name}`))
+      ...dependenciesToDelete.map((name) => chalk.red(`\n- ${name}`)),
     )
 
     console.info()
     console.info(
       chalk.hex('#ffffff').bgGreen(' Will install dependencies: '),
-      ...dependenciesToInstall.map(({ name }) => chalk.green(`\n+ ${name}`))
+      ...dependenciesToInstall.map(({ name }) => chalk.green(`\n+ ${name}`)),
     )
 
     console.info()
@@ -203,8 +203,8 @@ export class InitCommand implements CommandRunner {
         console.info()
         console.info(
           chalk.yellow(
-            `Cannot lint ${eslintrcName} using npm. You may do it manually or use yarn / pnpm`
-          )
+            `Cannot lint ${eslintrcName} using npm. You may do it manually or use yarn / pnpm`,
+          ),
         )
       } else {
         await this.manager.run(['eslint', '--no-ignore', '--fix', eslintrcName])
@@ -216,22 +216,22 @@ export class InitCommand implements CommandRunner {
           `Failed to lint ${eslintrcName}.` +
             ` Most likely it's the monorepo / typescript issue -` +
             ` please inspect the error and check out Common Issues section:` +
-            ` https://github.com/eslint-kit/eslint-kit#common-issues`
-        )
+            ` https://github.com/eslint-kit/eslint-kit#common-issues`,
+        ),
       )
     }
 
     console.info()
     console.info(
-      chalk.green('ESLint Kit installation is complete. Happy usage!')
+      chalk.green('ESLint Kit installation is complete. Happy usage!'),
     )
 
     console.info()
     console.info(
       chalk.yellow(
-        'To learn how to configure your editor for using with ESLint, check this out:'
+        'To learn how to configure your editor for using with ESLint, check this out:',
       ),
-      'https://github.com/eslint-kit/eslint-kit/tree/release#setting-up-editors'
+      'https://github.com/eslint-kit/eslint-kit/tree/release#setting-up-editors',
     )
   }
 }

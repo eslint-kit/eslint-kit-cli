@@ -23,7 +23,7 @@ export abstract class AbstractPackageManager {
   }
 
   public async addProduction(
-    dependencies: ProjectDependency[]
+    dependencies: ProjectDependency[],
   ): Promise<boolean> {
     const commandArguments = stringifyDependencies(dependencies)
     return this.add([this.cli.add, this.cli.saveFlag, ...commandArguments])

@@ -35,7 +35,7 @@ export async function askForPrettierOverride(): Promise<boolean> {
 }
 
 export async function askAboutPackageJsonScripts(
-  action: 'add' | 'replace'
+  action: 'add' | 'replace',
 ): Promise<boolean> {
   const name = 'allowed'
 
