@@ -65,9 +65,9 @@ export class InitCommand implements CommandRunner {
     }
 
     const dependenciesToInstall: ProjectDependency[] = [
-      { name: 'eslint-kit' },
-      { name: 'eslint' },
-      { name: 'prettier' },
+      { name: 'eslint-kit@^9' },
+      { name: 'eslint@^8.41.0' },
+      { name: 'prettier@^2' },
     ]
 
     console.info()

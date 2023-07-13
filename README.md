@@ -32,3 +32,10 @@ Go to [`release/latest`](https://github.com/eslint-kit/eslint-kit-cli/tree/relea
 ```sh
 $ npx eslint-kit-cli@latest
 ```
+
+Or if you want to use version v9 of `eslint-kit`:
+
+```sh
+$ npx eslint-kit-cli@^9
+```
+
