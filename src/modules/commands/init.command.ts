@@ -173,7 +173,9 @@ export class InitCommand implements CommandRunner {
       const scripts = packageJson.scripts ?? {}
       const dir = Array.from(directories).join(',')
       const ext = Array.from(extensions).join(',')
-      const glob = `"{${dir}}/**/*.{${ext}}"`
+      const dirGlob = directories.size > 1 ? `{${dir}}` : dir
+      const extGlob = extensions.size > 1 ? `{${ext}}` : ext
+      const glob = `"${dirGlob}/**/*.${extGlob}"`
       scripts.lint = `eslint ${glob}`
       scripts['lint:fix'] = `eslint ${glob} --fix`
       await this.meta.updatePackageJsonField('scripts', scripts)
