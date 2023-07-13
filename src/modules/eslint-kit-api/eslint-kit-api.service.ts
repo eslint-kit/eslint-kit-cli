@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common'
 import axios from 'axios'
 
 const repo = axios.create({
-  baseURL:
-    'https://raw.githubusercontent.com/eslint-kit/eslint-kit/release/latest',
+  baseURL: 'https://raw.githubusercontent.com/eslint-kit/eslint-kit/release/9',
 })
 
 @Injectable()
@@ -23,7 +22,7 @@ export class EslintKitApiService {
         'react',
         'react-new-jsx-transform',
         'typescript',
-      ].map((name) => `@eslint-kit/eslint-config-${name}`)
+      ].map((name) => `@eslint-kit/eslint-config-${name}`),
     )
   }
 
