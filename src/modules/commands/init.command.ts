@@ -1,7 +1,6 @@
 import fs from 'fs/promises'
 import path from 'path'
 import chalk from 'chalk'
-import execa from 'execa'
 import { Command, CommandRunner } from 'nest-commander'
 import {
   createEslintKitBuilder,
@@ -122,9 +121,11 @@ export class InitCommand implements CommandRunner {
     presets.push(builder.preset('node'))
     presets.push(builder.preset('prettier'))
 
+    extensions.add('js').add('mjs').add('cjs')
+
     if (await this.meta.hasTypeScript()) {
       presets.push(builder.preset('typescript'))
-      extensions.add('js').add('ts')
+      extensions.add('ts').add('mts')
     }
 
     if (await this.meta.hasReact()) {

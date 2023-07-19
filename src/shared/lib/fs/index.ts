@@ -27,7 +27,7 @@ export function resolveFromRoot(file: string) {
 }
 
 export async function readJson(
-  file: 'package.json'
+  file: 'package.json',
 ): Promise<PackageJson | null>
 
 export async function readJson(file: 'jsconfig.json'): Promise<Jsconfig | null>
@@ -52,7 +52,7 @@ export async function hasFile(file: string): Promise<boolean> {
 
 export async function writeFile(
   file: string,
-  content: string
+  content: string,
 ): Promise<boolean> {
   try {
     await fs.writeFile(path.resolve(process.cwd(), file), content)
