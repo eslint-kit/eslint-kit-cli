@@ -122,9 +122,11 @@ export class InitCommand implements CommandRunner {
     presets.push(builder.preset('node'))
     presets.push(builder.preset('prettier'))
 
+    extensions.add('js').add('mjs').add('cjs')
+
     if (await this.meta.hasTypeScript()) {
       presets.push(builder.preset('typescript'))
-      extensions.add('js').add('ts')
+      extensions.add('ts').add('mts')
     }
 
     if (await this.meta.hasReact()) {
