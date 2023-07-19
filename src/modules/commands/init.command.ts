@@ -9,6 +9,7 @@ import {
 import { removeFile } from '@app/shared/lib/fs'
 import { AbstractPackageManager } from '@app/shared/lib/package-managers'
 import { ProjectDependency } from '../../shared/lib/package-managers/types'
+import { Versions } from '../../shared/versions'
 import { EslintKitApiService } from '../eslint-kit-api'
 import { MetaService } from '../meta'
 import { InjectPackageManager } from '../package-manager'
@@ -64,9 +65,9 @@ export class InitCommand implements CommandRunner {
     }
 
     const dependenciesToInstall: ProjectDependency[] = [
-      { name: 'eslint-kit@^9' },
-      { name: 'eslint@^8.41.0' },
-      { name: 'prettier@^2' },
+      { name: `eslint-kit@${Versions.ESLintKit}` },
+      { name: `eslint@${Versions.ESLint}` },
+      { name: `prettier@${Versions.Prettier}` },
     ]
 
     console.info()
