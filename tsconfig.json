@@ -22,5 +22,6 @@
       "@app": ["./src"],
       "@app/*": ["./src/*"]
     }
-  }
+  },
+  "include": ["src", ".eslintrc.cjs"]
 }
