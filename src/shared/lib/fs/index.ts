@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import path from 'path'
 
-export interface PackageJson {
+export type PackageJson = {
   version: string
   type?: 'module' | 'commonjs'
   dependencies?: Record<string, string>
@@ -13,7 +13,7 @@ export interface PackageJson {
   _moduleAliases?: Record<string, string>
 }
 
-export interface Jsconfig {
+export type Jsconfig = {
   compilerOptions?: {
     baseUrl?: string
     paths?: Record<string, string[]>

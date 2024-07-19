@@ -7,6 +7,6 @@ module.exports = configure({
     presets.imports(),
     presets.node(),
     presets.prettier(),
-    presets.typescript(),
+    presets.typescript({ enforceUsingType: true }),
   ],
 })

@@ -1,6 +1,6 @@
 import { HttpException } from '@nestjs/common'
 
-interface Extend {
+type Extend = {
   code: string
   message: string
 }

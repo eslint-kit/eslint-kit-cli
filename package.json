@@ -2,15 +2,13 @@
   "name": "eslint-kit-cli",
   "version": "0.0.0-set-by-ci",
   "description": "Setup ESLint and Prettier with just one CLI command",
-  "author": "Evgeny Zakharov <risenforces@gmail.com>",
+  "author": "Evgenii Zakharov <to@risen.dev>",
   "repository": "git@github.com:eslint-kit/eslint-kit-cli.git",
   "license": "MIT",
   "files": [
     "dist/*"
   ],
-  "bin": {
-    "eslint-kit-cli": "dist/main.js"
-  },
+  "bin": "dist/main.js",
   "jest": {
     "moduleFileExtensions": [
       "js",
@@ -71,15 +69,16 @@
     "@types/jest": "27.5.0",
     "@types/jscodeshift": "^0.11.5",
     "@types/node": "^16.0.0",
-    "eslint": "^8.41.0",
-    "eslint-kit": "^10.0.0",
+    "eslint": "^8.56.0",
+    "eslint-kit": "^11.0.0",
     "jest": "28.0.3",
+    "prettier": "^3.0.0",
     "source-map-support": "^0.5.20",
     "ts-jest": "28.0.1",
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "4.0.0",
-    "typescript": "^4.3.5",
-    "prettier": "^3.0.0"
-  }
+    "typescript": "^4.7.4"
+  },
+  "packageManager": "yarn@4.2.2"
 }
