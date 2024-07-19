@@ -23,33 +23,6 @@ jobs:
         id: version
         uses: release-kit/semver@v2
 
-      - name: Get release branch name
-        id: release-branch
-        run: echo "::set-output name=name::${{ steps.version.outputs.prerelease != null && 'release/${{ steps.version.outputs.prerelease }}' || 'release/latest' }}"
-
-      - name: Checkout/create release branch
-        run: git checkout ${{ steps.release-branch.outputs.name }} || git checkout -b ${{ steps.release-branch.outputs.name }}
-
-      - name: Check if branch exists on remote
-        id: release-branch-exists
-        run: echo "::set-output name=exists::$(git ls-remote --heads ${{ github.server_url }}/${{ github.repository }} ${{ steps.release-branch.outputs.name }} | wc -l)"
-
-      - name: Create release branch if it's not exist
-        if: ${{ steps.release-branch-exists.outputs.exists == '0' }}
-        run: git push -u origin ${{ steps.release-branch.outputs.name }}
-
-      - name: Sync release branch with released tag
-        run: git reset --hard ${{ github.event.release.tag_name }}
-
-      - name: Push release branch to remote
-        uses: CasperWA/push-protected@v2
-        with:
-          token: ${{ secrets.FULL_ACCESS_GITHUB_TOKEN }}
-          branch: ${{ steps.release-branch.outputs.name }}
-          tags: true
-          force: true
-          unprotect_reviews: true
-
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -74,6 +47,22 @@ jobs:
         if: ${{ steps.version.outputs.prerelease == '' }}
         run: npm publish
 
+      - name: Force update remote latest release branch
+        if: ${{ steps.version.outputs.prerelease == '' }}
+        run: git push origin ${{ github.event.release.tag_name }}:refs/heads/release/latest -f
+
+      - name: Force update remote major release branch
+        if: ${{ steps.version.outputs.prerelease == '' }}
+        run: git push origin ${{ github.event.release.tag_name }}:refs/heads/release/${{ steps.version.outputs.major }} -f
+
       - name: Publish RC
         if: ${{ steps.version.outputs.prerelease != '' }}
         run: npm publish --tag ${{ steps.version.outputs.prerelease }}
+
+      - name: Force update remote latest release branch
+        if: ${{ steps.version.outputs.prerelease != '' }}
+        run: git push origin ${{ github.event.release.tag_name }}:refs/heads/release/latest-${{ steps.version.outputs.prerelease }} -f
+
+      - name: Force update remote major release branch
+        if: ${{ steps.version.outputs.prerelease != '' }}
+        run: git push origin ${{ github.event.release.tag_name }}:refs/heads/release/${{ steps.version.outputs.major }}-${{ steps.version.outputs.prerelease }} -f
