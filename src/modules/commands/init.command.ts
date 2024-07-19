@@ -125,7 +125,7 @@ export class InitCommand implements CommandRunner {
     extensions.add('js').add('mjs').add('cjs')
 
     if (await this.meta.hasTypeScript()) {
-      presets.push(builder.preset('typescript'))
+      presets.push(builder.preset('typescript', { enforceUsingType: true }))
       extensions.add('ts').add('mts')
     }
 

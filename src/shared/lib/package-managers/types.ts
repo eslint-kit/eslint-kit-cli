@@ -4,12 +4,12 @@ export enum PackageManager {
   PNPM = 'pnpm',
 }
 
-export interface ProjectDependency {
+export type ProjectDependency = {
   name: string
   version?: string
 }
 
-export interface PackageManagerCommands {
+export type PackageManagerCommands = {
   install: string
   add: string
   update: string
