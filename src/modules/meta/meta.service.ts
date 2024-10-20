@@ -45,6 +45,10 @@ export class MetaService {
     return this.hasRuntimeDependency('react')
   }
 
+  public async hasAstro() {
+    return this.hasRuntimeDependency('astro')
+  }
+
   public async hasNextJs() {
     return this.hasRuntimeDependency('next')
   }
