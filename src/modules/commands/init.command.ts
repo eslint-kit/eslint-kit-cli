@@ -138,6 +138,11 @@ export class InitCommand implements CommandRunner {
       }
     }
 
+    if (await this.meta.hasAstro()) {
+      presets.push(builder.preset('astro'))
+      extensions.add('astro')
+    }
+
     if (await this.meta.hasNextJs()) {
       presets.push(builder.preset('nextJs'))
       directories.add('pages').add('app').add('lib')
